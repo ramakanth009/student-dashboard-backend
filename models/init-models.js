@@ -6,12 +6,12 @@ var _courses = require('./course');
 
 function initModels(sequelize) {
   var user = _user(sequelize, DataTypes);
-  var userRefreshToken = _userRefreshToken(sequelize, DataTypes);
+  // var userRefreshToken = _userRefreshToken(sequelize, DataTypes);
   var userRole = _userRole(sequelize, DataTypes);
   var courses = _courses(sequelize, DataTypes);
 
-  userRefreshToken.belongsTo(user, { as: "user", foreignKey: "userId"});
-  user.hasMany(userRefreshToken, { as: "userRefreshTokens", foreignKey: "userId"});
+  // userRefreshToken.belongsTo(user, { as: "user", foreignKey: "userId"});
+  // user.hasMany(userRefreshToken, { as: "userRefreshTokens", foreignKey: "userId"});
   userRole.belongsTo(user, { as: "user", foreignKey: "userId"});
   user.hasMany(userRole, { as: "userRoles", foreignKey: "userId"});
   userRole.belongsTo(user, { as: "createdByUser", foreignKey: "createdBy"});
@@ -19,7 +19,7 @@ function initModels(sequelize) {
 
   return {
     user,
-    userRefreshToken,
+    // userRefreshToken,
     userRole,
     courses
   };

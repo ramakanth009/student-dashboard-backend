@@ -3,7 +3,7 @@ const config = require('../config/config');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const {WHITELISTED_ROLES_SIGNUP, DEFAULT_ROLES} = require('../helper/roles');
-const authHelper = require('../helper/auth');
+// const authHelper = require('../helper/auth');
 
 
 exports.signup = async (req, res) => {
@@ -83,19 +83,19 @@ exports.signin = async (req, res) => {
     user.userRoles = user.userRoles.map( (e) => e.roleName );
 
 
-    const accessToken = authHelper.generateAccessToken(user);
-    const refreshToken = await authHelper.generateRefreshToken(user);
+    // const accessToken = authHelper.generateAccessToken(user);
+    // const refreshToken = await authHelper.generateRefreshToken(user);
 
     return res
-        .cookie('refreshToken', refreshToken.token, {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'none',
-        })
+        // .cookie('refreshToken', refreshToken.token, {
+        //   httpOnly: true,
+        //   secure: true,
+        //   sameSite: 'none',
+        // })
         .status(200)
         .json({
-          accessToken: accessToken,
-          tokenType: 'Bearer',
+          // accessToken: accessToken,
+          // tokenType: 'Bearer',
           user: {
             firstName: user.firstName,
             lastName: user.lastName,
