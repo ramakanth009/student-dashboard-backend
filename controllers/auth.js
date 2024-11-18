@@ -187,26 +187,26 @@ exports.refreshToken = async (req, res) => {
 };
 
 exports.logout = async (req, res) => {
-  const cookies = req.cookies;
-  if (!cookies?.refreshToken) return res.status(401).send({status: 0, message: 'Invalid refresh token'});
+  // const cookies = req.cookies;
+  // if (!cookies?.refreshToken) return res.status(401).send({status: 0, message: 'Invalid refresh token'});
 
-  const refreshToken = cookies.refreshToken;
-  const foundToken = await db.userRefreshToken.findOne({where: {token: refreshToken}});
+  // const refreshToken = cookies.refreshToken;
+  // const foundToken = await db.userRefreshToken.findOne({where: {token: refreshToken}});
 
-  res.clearCookie('refreshToken', {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'none',
-  });
+  // res.clearCookie('refreshToken', {
+  //   httpOnly: true,
+  //   secure: true,
+  //   sameSite: 'none',
+  // });
 
-  if (foundToken) {
-    try {
-      const decodedOne = jwt.verify(refreshToken, config.jwtRefreshTokenSecret);
-      await db.userRefreshToken.destroy({where: {userId: decodedOne.userId, token: refreshToken}});
-      return res.status(200).send({status: 1, message: 'Logout...'});
-    } catch (e) {
-      return res.status(401).send({status: 0, message: 'Invalid refresh token'}); // Unauthorized
-    }
-  }
+  // if (foundToken) {
+  //   try {
+  //     const decodedOne = jwt.verify(refreshToken, config.jwtRefreshTokenSecret);
+  //     await db.userRefreshToken.destroy({where: {userId: decodedOne.userId, token: refreshToken}});
+  //     return res.status(200).send({status: 1, message: 'Logout...'});
+  //   } catch (e) {
+  //     return res.status(401).send({status: 0, message: 'Invalid refresh token'}); // Unauthorized
+  //   }
+  // }
   return res.status(200).send({status: 1, message: 'Logout...'});
 };

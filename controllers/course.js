@@ -7,8 +7,7 @@ exports.getCoursesList = async (req, res, next) => {
       where: {'course_type': courseType},
     });
     
-
-    res.status(200).json({
+ res.status(200).json({
       success: true,
       data: data,
     });
