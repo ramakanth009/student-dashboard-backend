@@ -112,79 +112,79 @@ exports.signin = async (req, res) => {
   };
 };
 
-exports.refreshToken = async (req, res) => {
-  const cookies = req.cookies;
-  if (!cookies?.refreshToken) return res.status(401).send({status: 0, message: 'Invalid refresh token'});
+// exports.refreshToken = async (req, res) => {
+//   const cookies = req.cookies;
+//   if (!cookies?.refreshToken) return res.status(401).send({status: 0, message: 'Invalid refresh token'});
 
-  const refreshToken = cookies.refreshToken;
-  res.clearCookie('refreshToken', {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'none',
-  });
+//   const refreshToken = cookies.refreshToken;
+//   res.clearCookie('refreshToken', {
+//     httpOnly: true,
+//     secure: true,
+//     sameSite: 'none',
+//   });
 
-  const foundToken = await db.userRefreshToken.findOne({where: {token: refreshToken}});
+//   const foundToken = await db.userRefreshToken.findOne({where: {token: refreshToken}});
 
-  // Detected refresh token reuse!
-  if (!foundToken) {
-    try {
-      const decodedOne = jwt.verify(refreshToken, config.jwtRefreshTokenSecret);
-      await db.userRefreshToken.destroy({where: {userId: decodedOne.userId}});
-      return res.status(401).send({status: 0, message: 'Invalid refresh token'}); // Unauthorized
-    } catch (e) {
-      return res.status(401).send({status: 0, message: 'Invalid refresh token'}); // Unauthorized
-    }
-  }
+//   // Detected refresh token reuse!
+//   if (!foundToken) {
+//     try {
+//       const decodedOne = jwt.verify(refreshToken, config.jwtRefreshTokenSecret);
+//       await db.userRefreshToken.destroy({where: {userId: decodedOne.userId}});
+//       return res.status(401).send({status: 0, message: 'Invalid refresh token'}); // Unauthorized
+//     } catch (e) {
+//       return res.status(401).send({status: 0, message: 'Invalid refresh token'}); // Unauthorized
+//     }
+//   }
 
-  // evaluate jwt
-  jwt.verify(
-      refreshToken,
-      config.jwtRefreshTokenSecret,
-      async (err, decoded) => {
-        if (err) {
-          console.log('expired refresh token');
-          await db.userRefreshToken.destroy({where: {token: refreshToken}});
-        }
-        if (err || foundToken.userId !== decoded.userId) return res.status(403).send({status: 0, message: 'Forbidden'});
+//   // evaluate jwt
+//   jwt.verify(
+//       refreshToken,
+//       config.jwtRefreshTokenSecret,
+//       async (err, decoded) => {
+//         if (err) {
+//           console.log('expired refresh token');
+//           await db.userRefreshToken.destroy({where: {token: refreshToken}});
+//         }
+//         if (err || foundToken.userId !== decoded.userId) return res.status(403).send({status: 0, message: 'Forbidden'});
 
-        // Refresh token was still valid
-        const user = await db.user.findOne( {
-          include: [{
-            model: db.userRole,
-            as: 'userRoles',
-            required: true,
-          }],
-          where: {id: decoded.userId},
-        });
+//         // Refresh token was still valid
+//         const user = await db.user.findOne( {
+//           include: [{
+//             model: db.userRole,
+//             as: 'userRoles',
+//             required: true,
+//           }],
+//           where: {id: decoded.userId},
+//         });
 
-        user.userRoles = user.userRoles.map( (e) => e.roleName );
+//         user.userRoles = user.userRoles.map( (e) => e.roleName );
 
-        const accessToken = authHelper.generateAccessToken(user);
-        const newRefreshToken = await authHelper.generateRefreshToken( user, false);
+//         const accessToken = authHelper.generateAccessToken(user);
+//         const newRefreshToken = await authHelper.generateRefreshToken( user, false);
 
-        // Update old token
-        foundToken.token = newRefreshToken.token;
-        foundToken.expires = newRefreshToken.expires;
-        foundToken.save();
+//         // Update old token
+//         foundToken.token = newRefreshToken.token;
+//         foundToken.expires = newRefreshToken.expires;
+//         foundToken.save();
 
-        // await db.userRefreshToken.destroy({ where: { token: refreshToken } });
+//         // await db.userRefreshToken.destroy({ where: { token: refreshToken } });
 
-        // Creates Secure Cookie with refresh token
-        return res
-            .cookie('refreshToken', newRefreshToken.token, {
-              httpOnly: true,
-              secure: true,
-              sameSite: 'none',
-            })
-            .status(200)
-            .json({
-              accessToken: accessToken,
-              tokenType: 'Bearer',
-              roles: user.userRoles,
-            });
-      },
-  );
-};
+//         // Creates Secure Cookie with refresh token
+//         return res
+//             .cookie('refreshToken', newRefreshToken.token, {
+//               httpOnly: true,
+//               secure: true,
+//               sameSite: 'none',
+//             })
+//             .status(200)
+//             .json({
+//               accessToken: accessToken,
+//               tokenType: 'Bearer',
+//               roles: user.userRoles,
+//             });
+//       },
+//   );
+// };
 
 exports.logout = async (req, res) => {
   // const cookies = req.cookies;

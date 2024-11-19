@@ -21,6 +21,7 @@ app.use(function(req, res, next) {
 // Routes
 require('./api/v1/routes/auth')(app);
 require('./api/v1/routes/course')(app);
+require('./api/v1/routes/curriculam')(app);
 
 const PORT = process.env.PORT || 3000;
 const server = http.createServer(app);
